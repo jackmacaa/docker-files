@@ -1,0 +1,37 @@
+version: '3.3'
+services:
+  php-apache-environment:
+    container_name: php-container
+    build: .
+    volumes:
+      - ./src:/var/www/html/
+      - ./docker/php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./docker/php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+
+    ports:
+      - "8080:80"
+  db:
+      container_name: db-container
+      image: mysql
+      restart: always
+      environment:
+        MYSQL_ROOT_PASSWORD: pass
+        MYSQL_DATABASE: shareposts
+        MYSQL_USER: jack
+        MYSQL_PASSWORD: pass
+      ports:
+        - "9906:3306"
+      volumes:
+        - mysql-data:/var/lib/sql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8081:80'
+    restart: always
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
+
+volumes:
+  mysql-data:
